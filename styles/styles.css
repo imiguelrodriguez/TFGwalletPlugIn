@@ -1,0 +1,73 @@
+* {
+	padding: 10px;
+}
+
+h1 {
+	text-align: center;
+	padding: 10px;
+	margin: 10px;
+}
+
+h2 {
+	padding: 10px;
+	margin: 10px;
+	text-align: center;
+	justify-content: center;
+}
+
+menu {
+	background-color: #9834eb;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	margin: 0;
+
+}
+
+.config-main{
+	display: grid;
+	place-items: center;
+
+}
+.qr_gen {
+
+}
+
+input {
+	padding: 6px;
+	margin: 5px;
+}
+
+#setup {
+	place-self: center;
+}
+
+p {
+	text-align: center;
+}
+ul {
+	list-style: none;
+	display: flex;
+	align-items: center;
+}
+
+li {
+	margin: 0.5em;
+	font-size: 1.5em;
+	padding: 9px;
+	display: inline-block;
+}
+
+
+body {
+	margin: 5px;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:visited {
+	color: black;
+}

@@ -1,0 +1,72 @@
+<!doctype html>
+
+<html xmlns="http://www.w3.org/1999/html">
+  <head>
+    <meta charset="utf-8" />
+	  <script src="../js/min/bootstrap.bundle.min.js"></script>
+	  <script src="../js/min/qrcode.min.js"></script>
+	  <script src="../js/min/web3.min.js"></script>
+	  <script src="../js/min/elliptic.min.js"></script>
+	  <script src="../js/helia/helia.min.js"></script>
+	  <script src="../js/helia/helia-unixfs.min.js"></script>
+	  <script src="../js/helia/libp2p.min.js"></script>
+	  <script src="../js/helia/libp2p-websocket.min.js"></script>
+	  <script src="../js/helia/libp2p-bootstrap.min.js"></script>
+	  <script src="../js/helia/libp2p-noise.min.js"></script>
+	  <script src="../js/helia/libp2p-yamux.min.js"></script>
+	  <script src="../js/helia/blockstore-core.min.js"></script>
+	  <script src="../js/helia/datastore-core.min.js"></script>
+	  <link rel="stylesheet" href="../styles/styles.css" />
+	  <link rel="stylesheet" href="../styles/bootstrap.min.css">
+
+	  <title>Configuration page</title>
+
+  </head>
+
+  <body>
+    <menu>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="config.html">Configuration</a></li>
+        </ul>
+    </menu>
+    <h1>PLUGIN CONFIGURATION</h1>
+	<div id="setup" class="container">
+	<main class="config-main">
+		<h1>Set up</h1>
+		<input id="ipfs" type="button" value="Connect to IPFS">
+		<input id="contract" type="button" value="Contract">
+		<input id="temp" type="button" value="Get temp">
+		<input id="create" type="button" value="BIP32">
+		<input id="enc" type="button" value="enc with pubkey">
+		<input id="store" type="button" value="store in IPFS">
+		<input id="gasprice" type="button" value="get gas price">
+		<input type="button" value="Send">
+		<p id="output" class="output"></p>
+		<form id="qr-generation-form">
+			<div>
+				<input type="text"
+				name="qr-code-content"
+				id="qr-content"
+				   class="rounded"
+				value=""
+				placeholder="Insert the SKM SC hash"
+				autocomplete="off" />
+			</div>
+			<div>
+				<input type="submit"  id="qr-button" class="btn btn-outline-primary btn-lg"
+				value="Generate QR Code" />
+			</div>
+		</form><br />
+		<div id="qr-code"></div>
+
+	</main>
+	</div>
+	<script src="../plugin.js"></script>
+	<script src="../js/bcManager.js"></script>
+	<script src="../js/bip32.js"></script>
+	<script src="../js/ipfsManager.js"></script>
+	<script src="../js/keyManager.js"></script>
+	<script src="../js/utils.js"></script>
+</body>
+</html>

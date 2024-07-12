@@ -1,0 +1,40 @@
+{
+    "manifest_version": 3,
+    "name": "SCplugin",
+    "version": "1.0",
+   "web_accessible_resources": [
+     {
+       "resources": ["IPFS_IP.txt" ],
+       "matches": [ "https://*/*" ]
+     }] ,
+    "description": "Deploys smart contracts.",
+   "permissions": [
+     "storage",
+     "webNavigation",
+     "tabs", "activeTab",
+     "webRequest"
+   ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "commands": {
+    "open_plugin": {
+      "suggested_key": {
+        "default": "Alt+Shift+P"
+      },
+      "description": "Opens the plugin"
+    }
+  },
+  "action": {
+    "default_popup": "html/index.html",
+    "default_icon": "icon.png"
+  },
+    "content_scripts": [
+      {
+        "js": ["plugin.js"],
+
+        "matches": [ "https://*/*" ]
+      }
+    ]
+  }
+  
