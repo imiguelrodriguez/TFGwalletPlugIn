@@ -1,4 +1,4 @@
-const IPFS_IP = "http://192.168.1.149:5001/"
+const IPFS_IP = "http://192.168.1.134:5001/"
 
 /**
  * Adds data to a file in the IPFS.
@@ -86,4 +86,27 @@ async function getFile(hash) {
 async function append(data, hash) {
     const prevData = getFile(hash)
     return addFile(prevData + "\n" + data)
+}
+
+async function storeInPrevious(ref, aesEnc, pubKeyEnc, privKey) {
+    // Get hi file from the IPFS (hiFile)  --- ref = hi
+    const hiFile = getFile(ref)
+
+    // Store the set ( EncKij (SKij , P Kij , j), EncP K0 (Kij ) ) in the IPFS.
+    // This process returns the reference of the stored file (hij ).
+    const hij = await addFile("((" + aesEnc.toString() + "),(" + pubKeyEnc.toString() + "))")
+
+    // Update file_hi by appending hij .
+    const hiPrime = append(hij, hiFile)
+    await storeRef(hiPrime, privKey)
+}
+
+async function storeInNew(aesEnc, pubKeyEnc, privKey) {
+    // store (EncKij(SKij, PKij, j)) , (EncPK0(Kij))
+    const h = await addFile("((" + aesEnc.toString() + "),(" + pubKeyEnc.toString() + "))")
+    // h holds the hash of the file where the encrypted bytes are stored
+    // but we need to create a new file that stores this hash h
+    let h2 = await addFile(h)
+    // h2 is the hash of the file that stores the other hashes
+    await storeRef(h2, privKey)
 }

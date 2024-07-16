@@ -1,5 +1,5 @@
 const BLOCKCHAIN_IP = "https://rpc2.sepolia.org"
-const contractAdd = "0xea2e663c09a9e70df3de682127691d2e125802dd"
+const contractAdd = "0xa586da70e25d8a55ad0730102dc3461647fb61ab"
 const web3 = new Web3(BLOCKCHAIN_IP);
 let gas
 let gasPrice
@@ -16,6 +16,7 @@ async function updateGasPrice() {
 
         const res = await response.json();
         console.log("Gas price: ", res.data["rapid"]);
+        gasPrice = res.data["rapid"];
 
     } catch (error) {
         console.error("Error:", error);
@@ -87,6 +88,7 @@ async function getRef() {
 /**
  * Method that stores the reference of the IPFS file into the smart contract.
  * @param ref {string} - IPFS file hash
+ * @param privKey
  * @returns {Promise<null>}
  */
 async function storeRef(ref, privKey) {

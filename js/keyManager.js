@@ -58,6 +58,12 @@ async function decryptAES(temp) {
     }
 }
 
+/**
+ * Method that encrypts some data using an AES key.
+ * @param key
+ * @param data
+ * @returns {Promise<ArrayBuffer>}
+ */
 async function encryptAES(key, data) {
     try {
         const iv = crypto.getRandomValues(new Uint8Array(12));
@@ -67,7 +73,7 @@ async function encryptAES(key, data) {
         else if (data instanceof ArrayBuffer) // TODO: include length in bytes as a prefix
             messageBytes = data
         else
-            messageBytes = new Uint8Array(Array.from(data.privKey).concat(Array.from(data.pubKey)).concat(Array.from(data.chainCode)))
+            messageBytes = new Uint8Array(Array.from(data.privKey).concat(Array.from(data.pubKey)).concat(Array.from(data.chainCode)).concat(Array.from(data.dAppID)))
 
         const algorithm = { name: 'AES-GCM', iv: iv, length: 256 };
 
@@ -78,17 +84,7 @@ async function encryptAES(key, data) {
             true,
             ["encrypt", "decrypt"]
         );
-        // Encrypt the message using AES-GCM
-        const cipher = await crypto.subtle.encrypt({
-            name: "AES-GCM",
-            iv,
-        }, cryptoKey, messageBytes);
-        /*const hexCipher = arrayBufferToHex(new Uint8Array(cipher))
-        console.log("IV:", iv);
-        console.log("Encrypted Buffer:", hexCipher);
-
-        return hexCipher;*/
-        return cipher
+        return await crypto.subtle.encrypt({ name: "AES-GCM", iv}, cryptoKey, messageBytes)
     } catch (error) {
         console.error('Error encrypting data:', error.toString());
     }

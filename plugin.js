@@ -108,56 +108,45 @@ async function getIdentifier()
 	});
 
 const storeIPFS = document.querySelector("#store")
-storeIPFS.addEventListener("click", async function onclick(event) {
-	//const f = await getIPFS_IP()
 
+
+
+async function navigation() {
+	// Get the RefsList value from the SKM SC associated to PKi
 	let ref = await getRef()
-	if (ref === null) { // first time to store info in the IPFS
-		// initialize masterPrivKey and so on
-		await decryptAES(await getTemp())
-		let browserKeyPair = Bip32.fromPrivKey(BigInt('0x' + arrayBufferToHex(masterPrivKey)), BigInt('0x' + arrayBufferToHex(masterChainCode)))
-		const j = await sha256(DAPP_URL)
-		let child = await browserKeyPair.deriveChildKey(Bip32.HARDENED_BIT | parseInt(j.substring(0, 8), 16))
+	// Initialize masterPrivKey and so on
+	await decryptAES(await getTemp())
+	let browserKeyPair = Bip32.fromPrivKey(BigInt('0x' + arrayBufferToHex(masterPrivKey)), BigInt('0x' + arrayBufferToHex(masterChainCode)))
+	const j = await sha256(DAPP_URL)
 
-		const dappKey = await generateSessionKeyDapp()
+	// Derive child key for dApp
+	let child = await browserKeyPair.deriveChildKey(Bip32.HARDENED_BIT | parseInt(j.substring(0, 8), 16))
+	const dappKey = await generateSessionKeyDapp()
 
-		// Encrypt the session key Kij (dappKey) using the Root Public Key PK0 (EncPK0(Kij)).
-		const c = await encryptWithPubKey(dappKey)
+	const data = {
+		pubKey: hexStringToArrayBuffer(child.publicKey.toString(16)),
+		privKey: hexStringToArrayBuffer(child.privateKey.toString(16)),
+		chainCode: hexStringToArrayBuffer(child.chain.toString(16)),
+		dAppID: j
+	}
 
-		// Encrypt the set (SKij, PKij, j) using the session key Kij (EncKij(SKij, PKij, j))
-		const data = {
-			pubKey: hexStringToArrayBuffer(child.publicKey.toString(16)),
-			privKey: hexStringToArrayBuffer(child.privateKey.toString(16)),
-			chainCode: hexStringToArrayBuffer(child.chain.toString(16))
-		}
+	// Encrypt the session key Kij (dappKey) using the Root Public Key PK0 (EncPK0(Kij)).
+	const c = await encryptWithPubKey(dappKey)
 
-		const enc = new Uint8Array(await encryptAES(dappKey, data))
+	// Encrypt the set (SKij, PKij, j) using the session key Kij (EncKij(SKij, PKij, j))
+	const enc = new Uint8Array(await encryptAES(dappKey, data))
 
-		const h = await addFile("((" + c.toString() + "),(" + enc.toString() + "))")
-		// h holds the hash of the file where the encrypted bytes are stored
-		// but we need to create a new file that stores this hash h
-		alert(h)
-		let h2 = await addFile(h)
-		// h2 is the hash of the file that stores the other hashes
-		const ret = await getFile(h)
-		alert(ret)
-		if(h2 === null)
-			h2 = "default"
-		await storeRef(h2, arrayBufferToHex(masterPrivKey))
-
+	if (ref === null) { // First time to store info in the IPFS
+		await storeInNew(enc, c, arrayBufferToHex(masterPrivKey));
 	}
 	else { // there is previously a file in the IPFS
-		// Get hi file from the IPFS (hiFile) - refs = hi
-		const hiFile = getFile(ref)
-		alert(hiFile)
-		// Store the set ( EncKij (SKij , P Kij , j), EncP K0 (Kij ) ) in the IPFS.
-		// This process returns the reference of the stored file (hij ).
-		const hij = addFile("( EncKij (SKij , P Kij , j), EncP K0 (Kij ) )")
-		// Update file_hi by appending hij .
-		const hiPrime = append(hij, hiFile)
-		alert(hiPrime)
-		await storeRef(hiPrime)
+		await storeInPrevious(ref, enc, c, arrayBufferToHex(masterPrivKey));
 	}
+}
+
+storeIPFS.addEventListener("click", async function onclick(event) {
+	//const f = await getIPFS_IP()
+	await navigation()
 	event.preventDefault();
 });
 
@@ -171,7 +160,17 @@ enc.addEventListener("click", async function onclick(event) {
 
 const gasP = document.querySelector("#gasprice")
 gasP.addEventListener("click", async function onclick(event) {
-	await updateGasPrice()
+	await updateGasPrice();
+
+	const storeRef = contractObject.methods.storeRef("rasiasjaoisjaosijaoisjaoisjaoisjaoisjaoklsa.,smalksjoaishef");
+
+	storeRef.estimateGas({from: web3.eth.accounts.privateKeyToAccount('0x' + arrayBufferToHex(masterPrivKey)).address}).then(function(gasAmount){
+		console.log(gasAmount)
+	})
+		.catch(function(error){
+		console.log(error)
+		});
+
 	event.preventDefault();
 });
 
