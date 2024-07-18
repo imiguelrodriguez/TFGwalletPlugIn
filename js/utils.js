@@ -3,7 +3,7 @@ function hexStringToArrayBuffer(hexString) {
          hexString = hexString.substring(2)
     // Ensure the hex string has an even number of characters
     if (hexString.length % 2 !== 0) {
-        throw new Error("Invalid hex string");
+        hexString = '0' + hexString
     }
 
     // Create an ArrayBuffer with length half of the hex string
@@ -17,6 +17,7 @@ function hexStringToArrayBuffer(hexString) {
 
     return uint8Array;
 }
+
 function arrayBufferToHex(buffer) {
     // Convert the ArrayBuffer to a Uint8Array
     const uint8Array = new Uint8Array(buffer);
@@ -29,6 +30,7 @@ function arrayBufferToHex(buffer) {
     }
     return hexString;
 }
+
 function bigIntToByteArray(number) {
     const hexString = number.toString(16);
     let tempBytes = new Uint8Array(hexString.length/2);
@@ -45,7 +47,6 @@ function bigIntToByteArray(number) {
 }
 
 async function getIPFS_IP() {
-
     chrome.runtime.sendMessage("getIPFS_IP")
         .then(result => {
             return result;
@@ -55,4 +56,28 @@ async function getIPFS_IP() {
         });
 }
 
+function generateRandomURL() {
+
+    const protocol = ['http', 'https'];
+    const domains = ['es', 'com', 'org', 'net', 'info', 'biz'];
+    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function getRandomString(length) {
+        let result = '';
+        for (let i = 0; i < length; i++) {
+            result += characters.charAt(getRandomInt(0, characters.length - 1));
+        }
+        return result;
+    }
+
+    const randomProtocol = protocol[getRandomInt(0, protocol.length - 1)];
+    const randomDomainName = getRandomString(getRandomInt(5, 15));
+    const randomDomain = domains[getRandomInt(0, domains.length - 1)];
+
+    return `${randomProtocol}://${randomDomainName}.${randomDomain}`;
+}
 

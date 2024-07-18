@@ -30,7 +30,6 @@ async function addFile(data) {
         const res = await response.json();
         console.log("Added file to IPFS:", res.Hash);
         return res.Hash
-        // Use the CID for further actions
     } catch (error) {
         console.error("Error:", error);
         return null
@@ -84,26 +83,42 @@ async function getFile(hash) {
  * @returns {string} The hash of the newly created file.
  */
 async function append(data, hash) {
-    const prevData = getFile(hash)
-    return addFile(prevData + "\n" + data)
+    const prevData = await getFile(hash)
+    return await addFile(prevData + "," + data)
 }
 
+
+/**
+ * Stores data in the IPFS if the reference stored in the SC is not null. That is, it exists
+ * a previous file in the IPFS so that append is needed.
+ * @param ref {string} - String with the hash of the previous file.
+ * @param aesEnc {Uint8Array} - first encrypted message to be stored.
+ * @param pubKeyEnc {Array} - second encrypted message to be stored.
+ * @param privKey {string} - Private key of the sender to get its address in the blockchain.
+ */
 async function storeInPrevious(ref, aesEnc, pubKeyEnc, privKey) {
     // Get hi file from the IPFS (hiFile)  --- ref = hi
-    const hiFile = getFile(ref)
+    const hiFile = await getFile(ref)
 
     // Store the set ( EncKij (SKij , P Kij , j), EncP K0 (Kij ) ) in the IPFS.
     // This process returns the reference of the stored file (hij ).
-    const hij = await addFile("((" + aesEnc.toString() + "),(" + pubKeyEnc.toString() + "))")
+    const hij = await addFile("((" + aesEnc.toString() + ");(" + pubKeyEnc.toString() + "))")
 
     // Update file_hi by appending hij .
-    const hiPrime = append(hij, hiFile)
+    const hiPrime = await append(hij, hiFile)
     await storeRef(hiPrime, privKey)
 }
 
+/**
+ * Stores data in the IPFS if the reference stored in the SC is null. That is, there is no
+ * previous file stored in the IPFS. New file is needed.
+ * @param aesEnc {Uint8Array} - first encrypted message to be stored.
+ * @param pubKeyEnc {Array} - second encrypted message to be stored.
+ * @param privKey {string} - Private key of the sender to get its address in the blockchain.
+ */
 async function storeInNew(aesEnc, pubKeyEnc, privKey) {
     // store (EncKij(SKij, PKij, j)) , (EncPK0(Kij))
-    const h = await addFile("((" + aesEnc.toString() + "),(" + pubKeyEnc.toString() + "))")
+    const h = await addFile("((" + aesEnc.toString() + ");(" + pubKeyEnc.toString() + "))")
     // h holds the hash of the file where the encrypted bytes are stored
     // but we need to create a new file that stores this hash h
     let h2 = await addFile(h)

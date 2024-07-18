@@ -1,7 +1,3 @@
-
-const DAPP_URL = "www.dapp.com" // example dApp URL
-let contractObject
-let browserKey
 let sessionKey
 let masterPrivKey
 let masterPubKey
@@ -87,18 +83,10 @@ async function getIdentifier()
 		event.preventDefault();
 	});
 
-
-	const ipfsButton = document.querySelector("#ipfs")
-	ipfsButton.addEventListener("click", async function onclick(event) {
-		await fetchDataFromIPFS("QmRAQB6YaCyidP37UdDnjFY5vQuiBrcqdyoW1CuDgwxkD4")
-		event.preventDefault();
-	});
-
-
 	const bip32Button = document.querySelector("#create")
 	bip32Button.addEventListener("click", async function onclick(event) {
 		let browserKeyPair = Bip32.fromPrivKey(BigInt('0x' + arrayBufferToHex(masterPrivKey)), BigInt('0x' + arrayBufferToHex(masterChainCode)))
-		const j = await sha256(DAPP_URL)
+		const j = await sha256(generateRandomURL())
 		let child = await browserKeyPair.deriveChildKey(Bip32.HARDENED_BIT | parseInt(j.substring(0, 8), 16))
 		console.log(child.getPrivateKey())
 		console.log(child.getPublicKey())
@@ -109,15 +97,13 @@ async function getIdentifier()
 
 const storeIPFS = document.querySelector("#store")
 
-
-
 async function navigation() {
 	// Get the RefsList value from the SKM SC associated to PKi
-	let ref = await getRef()
+	let ref = await getRef(arrayBufferToHex(masterPrivKey))
 	// Initialize masterPrivKey and so on
 	await decryptAES(await getTemp())
 	let browserKeyPair = Bip32.fromPrivKey(BigInt('0x' + arrayBufferToHex(masterPrivKey)), BigInt('0x' + arrayBufferToHex(masterChainCode)))
-	const j = await sha256(DAPP_URL)
+	const j = await sha256(generateRandomURL())
 
 	// Derive child key for dApp
 	let child = await browserKeyPair.deriveChildKey(Bip32.HARDENED_BIT | parseInt(j.substring(0, 8), 16))
@@ -131,7 +117,7 @@ async function navigation() {
 	}
 
 	// Encrypt the session key Kij (dappKey) using the Root Public Key PK0 (EncPK0(Kij)).
-	const c = await encryptWithPubKey(dappKey)
+	const c = await encryptWithPubKey('04' + arrayBufferToHex(masterPubKey), dappKey)
 
 	// Encrypt the set (SKij, PKij, j) using the session key Kij (EncKij(SKij, PKij, j))
 	const enc = new Uint8Array(await encryptAES(dappKey, data))
@@ -147,30 +133,6 @@ async function navigation() {
 storeIPFS.addEventListener("click", async function onclick(event) {
 	//const f = await getIPFS_IP()
 	await navigation()
-	event.preventDefault();
-});
-
-const enc = document.querySelector("#enc")
-enc.addEventListener("click", async function onclick(event) {
-	await generateSessionKeyDapp()
-	const c = await encryptWithPubKey('hey')
-
-	event.preventDefault();
-});
-
-const gasP = document.querySelector("#gasprice")
-gasP.addEventListener("click", async function onclick(event) {
-	await updateGasPrice();
-
-	const storeRef = contractObject.methods.storeRef("rasiasjaoisjaosijaoisjaoisjaoisjaoisjaoklsa.,smalksjoaishef");
-
-	storeRef.estimateGas({from: web3.eth.accounts.privateKeyToAccount('0x' + arrayBufferToHex(masterPrivKey)).address}).then(function(gasAmount){
-		console.log(gasAmount)
-	})
-		.catch(function(error){
-		console.log(error)
-		});
-
 	event.preventDefault();
 });
 

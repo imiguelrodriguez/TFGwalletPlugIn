@@ -115,6 +115,8 @@ class Bip32 {
         for (let byte of p) {
             hexString += byte.toString(16).padStart(2, '0');
         }
+        if (hexString.length % 2 !== 0)
+            hexString = '0' + hexString;
         return BigInt('0x' + hexString);
     }
 
@@ -147,7 +149,10 @@ class Bip32 {
         il.fill(0);
 
         const privateKey = (this.privateKey + ilInt) % Bip32.N;
-        return Bip32.fromPrivKey(privateKey, BigInt('0x' + arrayBufferToHex(chainCodeNew))); // both private key and chain code as big integer
+        let chainCode = arrayBufferToHex(chainCodeNew)
+        if (chainCode.length % 2 !== 0)
+            chainCode = '0' + chainCode;
+        return Bip32.fromPrivKey(privateKey, BigInt('0x' + chainCode)); // both private key and chain code as big integer
     }
 
 

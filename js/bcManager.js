@@ -1,9 +1,12 @@
 const BLOCKCHAIN_IP = "https://rpc2.sepolia.org"
-const contractAdd = "0xa586da70e25d8a55ad0730102dc3461647fb61ab"
+const contractAdd = "0x4937449274df32696e89a1c651f884eed5e0cb44"
 const web3 = new Web3(BLOCKCHAIN_IP);
-let gas
-let gasPrice
+let contractObject
 
+/**
+ * Method that calls the sepolia beacon chain API to get the current estimated gas price.
+ * @returns {bigint}
+ */
 async function updateGasPrice() {
     try {
         const response = await fetch('https://sepolia.beaconcha.in/api/v1/execution/gasnow', {
@@ -16,12 +19,12 @@ async function updateGasPrice() {
 
         const res = await response.json();
         console.log("Gas price: ", res.data["rapid"]);
-        gasPrice = res.data["rapid"];
+        return res.data["rapid"];
 
     } catch (error) {
         console.error("Error:", error);
+        return 40000n; // return default value
     }
-
 }
 
 /**
@@ -41,21 +44,26 @@ async function contract(contractAddress) {
     contractObject = new web3.eth.Contract(contractAbi, contractAddress);
 }
 
+
+/**
+ * Method that gets tbe smartphone ID (public key) stored in the smart contract.
+ * @returns {string|null}
+ */
 async function getPubKey() {
     try {
         if (contractObject == null)
             await contract(contractAdd);
-        const publicKey = await contractObject.methods.getSmartphoneID().call();
-        alert(publicKey);
+        return await contractObject.methods.getSmartphoneID().call();
     } catch (e) {
         alert(e);
+        return null
     }
 }
 
 /**
  * Method that gets the temp value of the smart contract.
  *
- * @returns {Promise<string|null>}
+ * @returns {string|null}
  */
 async function getTemp() {
     try {
@@ -72,13 +80,16 @@ async function getTemp() {
  *  Method that gets the reference list of the current plugin
  *  from the smart contract.
  *
- *  @returns {Promise<string|null>}
+ *  @param {string} privKey - Private key of the sender to get its address in the blockchain.
+ *  @returns {string|null}
  */
-async function getRef() {
+async function getRef(privKey) {
     try {
         if (contractObject == null)
             await contract(contractAdd);
-        return await contractObject.methods.getRef().call();
+        const from = web3.eth.accounts.privateKeyToAccount('0x' + privKey.toString(16)).address;
+
+        return await contractObject.methods.getRef().call({from: from});
     } catch (e) {
         alert(e);
         return null
@@ -88,10 +99,22 @@ async function getRef() {
 /**
  * Method that stores the reference of the IPFS file into the smart contract.
  * @param ref {string} - IPFS file hash
+ * @param {ArrayBuffer} privKey - Private key of the sender to get its address in the blockchain.
  * @param privKey
- * @returns {Promise<null>}
  */
 async function storeRef(ref, privKey) {
+    const gasPrice = await updateGasPrice();
+
+    const storeRef = contractObject.methods.storeRef(ref);
+    let gasAmount = 0;
+    const from = web3.eth.accounts.privateKeyToAccount('0x' + privKey.toString(16)).address;
+    await storeRef.estimateGas({from: from}).then(function(gas){
+        console.log(gas);
+        gasAmount = gas;
+    }).catch(function(error){
+        console.log(error)
+    });
+
     try {
         if (contractObject == null)
             await contract(contractAdd);
@@ -103,8 +126,8 @@ async function storeRef(ref, privKey) {
             from: from,
             to: contractAdd,
             data,
-            gas: web3.utils.toWei('0.017', 'gwei'), // Gas limit
-            gasPrice: web3.utils.toWei('20', 'gwei') // Gas price in Gwei (1 Gwei = 10^9 Wei)
+            gas: gasAmount, //web3.utils.toWei('0.017', 'gwei'), // Gas limit
+            gasPrice: gasPrice //web3.utils.toWei('20', 'gwei') // Gas price in Gwei (1 Gwei = 10^9 Wei)
         };
 
         const signedTx = await web3.eth.accounts.signTransaction(tx, privKey);
@@ -113,10 +136,8 @@ async function storeRef(ref, privKey) {
             .on('receipt', console.log)
             .on('error', console.error);
 
-
     } catch (e) {
         alert(e);
-        return null
     }
 }
 

@@ -48,6 +48,8 @@ async function decryptAES(temp) {
 
         if (masterPrivKey.byteLength === 33)
             masterPrivKey = masterPrivKey.slice(1)
+        if (new Uint8Array(masterPubKey)[0] === 0)
+            masterPubKey = masterPubKey.slice(1)
         // Convert the decrypted ArrayBuffer to a string
         const decryptedData = arrayBufferToHex(decryptedBuffer);
 
@@ -67,7 +69,7 @@ async function decryptAES(temp) {
 async function encryptAES(key, data) {
     try {
         const iv = crypto.getRandomValues(new Uint8Array(12));
-        let messageBytes = null
+        let messageBytes
         if(typeof data === "string")
             messageBytes = new TextEncoder().encode(data);
         else if (data instanceof ArrayBuffer) // TODO: include length in bytes as a prefix
@@ -131,15 +133,46 @@ async function generateSessionKeyDapp() {
     return rawKey;
 }
 
-async function encryptWithPubKey(data) {
+async function encryptWithPubKey(publicKey, data) {
+    // initialize EC
+    const EC = elliptic.ec;
+    const ec = new EC('secp256k1');
+    const r = ec.genKeyPair();
+
+    // Step 1: We have a public key (y_A = g^alpha mod p)
+    // Convert the public key to an elliptic curve key object
+    const key = ec.keyFromPublic(publicKey, 'hex');
+
+    // Step 2: Get an exponent "r" large enough between 1 and p-1
+    //const r = ec.genKeyPair();
+
+    // Step 3: Calculate the session key using y_A^r mod p = x
+    const y_A_r = key.getPublic().mul(r.getPrivate()).x;  // y_A^r mod p
+    const sessionKey = y_A_r.toString(16);
+
+    // Step 3.1: Perform SHA256(x) to get k (AES session key)
+    const k = await sha256(sessionKey);
+
+    // Step 4: Encrypt the message using AES_k(message) = c1
+
+    const c1 = await encryptAES(hexStringToArrayBuffer(k), data)
+    const lengthC1 = c1.byteLength
+
+    // Step 5: Generate the second cryptogram using g^r mod p = c2
+    const c2 = ec.g.mul(r.getPrivate()).encode();
+    return Array.from(new Uint8Array(c1)).concat(c2).concat(lengthC1)
+
+    /*
     const k = localStorage.getItem("dAppKey")
     const hashedK = await sha256(k)
     const c1 = await encryptAES(hexStringToArrayBuffer(hashedK), data)
-    const EC = elliptic.ec;
-    const ec = new EC('secp256k1');
+
     const basePoint = ec.g;
     const p =  basePoint.mul(hashedK) // apparently modulo is handled internally
     const c2 = p.getX().toArray().concat(p.getY().toArray())
+    const lengthC1 = c1.byteLength
+    // only necessary c1 length, the rest will be c2
+    return Array.from(new Uint8Array(c1)).concat(c2).concat(lengthC1)
 
-    return Array.from(new Uint8Array(c1)).concat(c2)
+     */
 }
