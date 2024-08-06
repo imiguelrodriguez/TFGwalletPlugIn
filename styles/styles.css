@@ -1,7 +1,3 @@
-* {
-	padding: 10px;
-}
-
 h1 {
 	text-align: center;
 	padding: 10px;
@@ -15,23 +11,43 @@ h2 {
 	justify-content: center;
 }
 
+ol {
+	padding-bottom: 10px;
+}
+
+.btn_color {
+	background-color: #9834eb;
+	border: none;
+}
+
+.btn_color:hover {
+	border: none;
+	background-color: #7202cd;
+}
+
+.btn_color:disabled {
+	background-color: #a678cc;
+}
+
 menu {
 	background-color: #9834eb;
 	display: flex;
-	flex-direction: row;
-	align-items: center;
 	justify-content: center;
 	margin: 0;
+	padding: 0;
+	width: 100%;
+	border-bottom-right-radius: 20px;
+	border-bottom-left-radius: 20px;
 
 }
 
-.config-main{
+.config-main, #home, .not-configured{
 	display: grid;
 	place-items: center;
 
 }
-.qr_gen {
-
+.qr-code, #qr-code-recover {
+	padding: 10px;
 }
 
 input {
@@ -49,19 +65,15 @@ p {
 ul {
 	list-style: none;
 	display: flex;
-	align-items: center;
+	padding: 0;
+	margin: 0;
 }
 
-li {
+.li-menu {
 	margin: 0.5em;
 	font-size: 1.5em;
-	padding: 9px;
+	padding: 8px;
 	display: inline-block;
-}
-
-
-body {
-	margin: 5px;
 }
 
 a {

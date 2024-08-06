@@ -81,3 +81,23 @@ function generateRandomURL() {
     return `${randomProtocol}://${randomDomainName}.${randomDomain}`;
 }
 
+async function sha256(string) {
+    function isHexString(str) {
+        return /^[0-9a-fA-F]+$/.test(str);
+    }
+
+    let data;
+    if (isHexString(string)) {
+        // Convert hex string to Uint8Array
+        data = hexStringToArrayBuffer(string);
+    } else {
+        // Convert to UTF-8 encoded Uint8Array
+        data = new TextEncoder().encode(string);
+    }
+
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray
+        .map((bytes) => bytes.toString(16).padStart(2, '0'))
+        .join('');
+}

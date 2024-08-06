@@ -1,26 +1,41 @@
 <!doctype html>
-
 <html lang="en-EN">
   <head>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../styles/styles.css" />
-      <script src="../js/min/bootstrap.bundle.min.js"></script>
-      <script src="../js/min/web3.min.js"></script>
+    <script src="../js/min/bootstrap.bundle.min.js"></script>
+    <script src="../js/min/qrcode.min.js"></script>
+    <script src="../js/min/web3.min.js"></script>
+    <script src="../js/min/elliptic.min.js"></script>
+    <link rel="stylesheet" href="../styles/bootstrap.min.css">
       <link rel="stylesheet" href="../styles/styles.css" />
-      <link rel="stylesheet" href="../styles/bootstrap.min.css">
       <title>Plugin</title>
   </head>
 
   <body>
     <menu>
         <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="config.html">Configuration</a></li>
+          <li class="li-menu"><a href="index.html"><img src="../imgs/house-solid.svg" alt="home" style="width: 30px; height: 30px;"></a></li>
+          <li class="li-menu"><a href="config.html"><img src="../imgs/gear-solid.svg" alt="settings" style="width: 30px; height: 30px;"></a></li>
         </ul>
     </menu>
-    <h1>PLUGIN HOME</h1>
-    <p>Your plugin is not configured yet. Please, go to <input type="button" id="open" value="Configuration">  section first</p>
-    <script src="../js/openTab.js"></script>
+    <div class="container" id="home">
+      <h2>DApp key management</h2>
+      <ol class="list-group list-group-numbered">
+        <li class="list-group-item">Click the button below to register a new dApp to the app.</li>
+        <li class="list-group-item">Then, wait until an alert window is shown.</li>
+        <li class="list-group-item">If the transaction has been successful, the new keys will be available from the app.</li>
+      </ol>
+      <button class="btn btn-primary btn-lg btn_color mb-3" id="dapp" type="button" disabled="disabled">New dApp</button>
 
-</body>
+      <div class="not-configured">
+        <p>Your plugin is not configured yet. Please, go to the <a href="config.html">Configuration <img src="../imgs/gear-solid.svg" alt="settings" style="width: 20px; height: 20px;"></a> section first</p>
+      </div>
+        </div>
+    <script src="../js/bcManager.js"></script>
+    <script src="../js/bip32.js"></script>
+    <script src="../js/ipfsManager.js"></script>
+    <script src="../js/keyManager.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/index.js"></script>
+  </body>
 </html>

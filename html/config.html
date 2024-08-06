@@ -1,60 +1,57 @@
 <!doctype html>
-
-<html xmlns="http://www.w3.org/1999/html" lang="en">
-  <head>
-    <meta charset="utf-8" />
-	  <script src="../js/min/bootstrap.bundle.min.js"></script>
-	  <script src="../js/min/qrcode.min.js"></script>
-	  <script src="../js/min/web3.min.js"></script>
-	  <script src="../js/min/elliptic.min.js"></script>
-	  <link rel="stylesheet" href="../styles/styles.css" />
-	  <link rel="stylesheet" href="../styles/bootstrap.min.css">
-
-	  <title>Configuration page</title>
-
-  </head>
-
-  <body>
-    <menu>
-        <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="config.html">Configuration</a></li>
-        </ul>
-    </menu>
-    <h1>PLUGIN CONFIGURATION</h1>
-	<div id="setup" class="container">
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<script src="../js/min/bootstrap.bundle.min.js"></script>
+	<script src="../js/min/qrcode.min.js"></script>
+	<script src="../js/min/web3.min.js"></script>
+	<script src="../js/min/elliptic.min.js"></script>
+	<link rel="stylesheet" href="../styles/bootstrap.min.css">
+	<link rel="stylesheet" href="../styles/styles.css" />
+	<title>Configuration page</title>
+</head>
+<body>
+<menu>
+	<ul>
+		<li class="li-menu"><a href="index.html"><img src="../imgs/house-solid.svg" alt="house" style="width: 30px; height: 30px;"></a></li>
+		<li class="li-menu"><a href="config.html"><img src="../imgs/gear-solid.svg" alt="house" style="width: 30px; height: 30px;"></a></li>
+	</ul>
+</menu>
+<div id="setup" class="container">
 	<main class="config-main">
 		<h1>Set up</h1>
-		<input id="contract" type="button" value="Contract">
-		<input id="temp" type="button" value="Get temp">
-		<input id="create" type="button" value="BIP32">
-		<input id="store" type="button" value="store in IPFS">
-		<input type="button" value="Send">
+		<ol class="list-group list-group-numbered">
+			<li class="list-group-item">To configure the plugin, paste the Smart Contract address (in hexadecimal with "0x" prefix).</li>
+			<li class="list-group-item">Then, click the button to generate the QR code.</li>
+			<li class="list-group-item">Scan the code with the smartphone to add the plugin.</li>
+		</ol>
 		<p id="output" class="output"></p>
 		<form id="qr-generation-form">
 			<div>
 				<input type="text"
-				name="qr-code-content"
-				id="qr-content"
-				   class="rounded"
-				value=""
-				placeholder="Insert the SKM SC hash"
-				autocomplete="off" />
+					   name="qr-code-content"
+					   id="qr-content"
+					   class="rounded mb-2"
+					   value=""
+					   placeholder="Insert the SKM SC hash"
+					   autocomplete="off"/>
 			</div>
 			<div>
-				<input type="submit"  id="qr-button" class="btn btn-outline-primary btn-lg"
-				value="Generate QR Code" />
+				<input type="submit" id="qr-button" class="btn btn-primary btn-lg  btn_color mb-3" value="Generate QR Code" />
 			</div>
-		</form><br />
+		</form><br/>
 		<div id="qr-code"></div>
 
+		<h2>Have you lost your device?</h2>
+		<p>Don't worry, here you can regenerate the QR to recover your keys.</p>
+		<button class="btn btn-primary btn-lg btn_color mb-3" id="recover" type="button" disabled="disabled">Regenerate QR Code</button>
+		<div id="qr-code-recover"></div>
 	</main>
-	</div>
-	<script src="../plugin.js"></script>
-	<script src="../js/bcManager.js"></script>
-	<script src="../js/bip32.js"></script>
-	<script src="../js/ipfsManager.js"></script>
-	<script src="../js/keyManager.js"></script>
-	<script src="../js/utils.js"></script>
+
+
+</div>
+<script src="../js/config.js"></script>
+<script src="../js/keyManager.js"></script>
+<script src="../js/utils.js"></script>
 </body>
 </html>

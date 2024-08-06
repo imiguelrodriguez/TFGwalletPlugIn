@@ -2,16 +2,12 @@
   "name": "plugin",
   "version": "1.0.0",
   "description": "",
-  "main": "plugin.js",
+  "main": "js/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "private": true,
   "dependencies": {
-    "@helia/unixfs": "^3.0.6",
-    "bip32": "^4.0.0",
-    "grpc": "^1.24.11",
-    "helia": "^4.2.3",
     "tiny-secp256k1": "^2.2.3"
   }
 }

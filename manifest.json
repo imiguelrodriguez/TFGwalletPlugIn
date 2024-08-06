@@ -26,12 +26,12 @@
     }
   },
   "action": {
-    "default_popup": "html/index.html",
+    "default_popup": "html/popup.html",
     "default_icon": "icon.png"
   },
     "content_scripts": [
       {
-        "js": ["plugin.js"],
+        "js": ["js/index.js", "js/config.js"],
 
         "matches": [ "https://*/*" ]
       }
