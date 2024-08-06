@@ -75,7 +75,15 @@ async function navigation() {
 }
 
 newDapp.addEventListener("click", async function onclick(event) {
-    //const f = await getIPFS_IP()
+    await (async () => {
+        try {
+            IPFS_IP = (await getIPFS_IP()).fileContent;
+            console.log("IPFS IP:", IPFS_IP);
+        } catch (error) {
+            console.error("Failed to get IPFS IP:", error);
+        }
+    })();
+
     // Get the button element
     const button = document.getElementById('dapp');
     const originalClass = button.className;

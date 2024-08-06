@@ -1,4 +1,4 @@
-const IPFS_IP = "http://192.168.100.25:5001/"
+let IPFS_IP
 
 /**
  * Adds data to a file in the IPFS.

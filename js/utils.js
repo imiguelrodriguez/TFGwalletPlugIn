@@ -47,13 +47,20 @@ function bigIntToByteArray(number) {
 }
 
 async function getIPFS_IP() {
-    chrome.runtime.sendMessage("getIPFS_IP")
-        .then(result => {
-            return result;
-        })
-        .catch(error => {
-            console.error("Error getting IPFS IP:", error);
+    try {
+        return await new Promise((resolve, reject) => {
+            chrome.runtime.sendMessage("getIPFS_IP", response => {
+                if (chrome.runtime.lastError) {
+                    reject(chrome.runtime.lastError);
+                } else {
+                    resolve(response);
+                }
+            });
         });
+    } catch (error) {
+        console.error("Error getting IPFS IP:", error);
+        throw error; // Optionally re-throw the error if you want to handle it elsewhere
+    }
 }
 
 function generateRandomURL() {

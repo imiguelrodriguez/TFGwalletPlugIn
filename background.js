@@ -1,20 +1,3 @@
-/**
- * THIS SECTION HANDLES THE CREATION OF NEW TABS
- */
-
-function handleCreated(tab) {
-    console.log(tab.url);
-}
-
-function handleUpdated(tabId, changeInfo) {
-    if (changeInfo.url) {
-        console.log(`Tab: ${tabId} URL changed to ${changeInfo.url}`);
-    }
-}
-chrome.tabs.onCreated.addListener(handleCreated);
-
-chrome.tabs.onUpdated.addListener(handleUpdated);
-
 
 
 async function readFile(file) {
@@ -32,14 +15,20 @@ async function readFile(file) {
 
 }
 
-chrome.runtime.onMessage.addListener( (message, sender, sendResponse) => {
-    // 2. A page requested user data, respond with a copy of `user`
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message === 'getIPFS_IP') {
-        try {
-           return readFile("IPFS_IP.txt");
-        } catch (error) {
-            console.error("Error reading file:", error);
-            sendResponse({error: error.message}); // Send an error message
-        }
+        // Indicate that sendResponse will be called asynchronously
+        (async () => {
+            try {
+                const fileContent = await readFile("IPFS_IP.txt");
+                sendResponse({fileContent});
+            } catch (error) {
+                console.error("Error reading file:", error);
+                sendResponse({ error: error.message }); // Send an error message
+            }
+        })();
+
+        // Return true to indicate that the response will be sent asynchronously
+        return true;
     }
 });
